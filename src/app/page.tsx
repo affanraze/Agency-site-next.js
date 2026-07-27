@@ -114,13 +114,6 @@ export default function HomePage() {
     const mm = gsap.matchMedia();
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.hero-badge', {
-        opacity: 0,
-        y: -20,
-        duration: 0.8,
-        ease: 'power2.out',
-      });
-
       gsap.from(heroTitleRef.current!.children, {
         y: 80,
         opacity: 0,
@@ -198,29 +191,22 @@ export default function HomePage() {
       {/* HERO SECTION */}
       <section
         ref={heroRef}
-        className="relative min-h-screen bg-ink text-ivory flex flex-col justify-between overflow-hidden"
+        className="relative min-h-screen bg-ink text-ivory flex flex-col justify-start overflow-hidden"
       >
         {/* GPU-native Radial Gradient Ambient Accent (Zero blur overhead) */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] sm:w-[500px] md:w-[600px] h-[300px] sm:h-[500px] md:h-[600px] bg-[radial-gradient(circle_at_center,rgba(74,106,64,0.25)_0%,transparent_70%)] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-start px-6 sm:px-8 md:px-12 pt-32 sm:pt-36 md:pt-40 pb-8 relative z-10">
-          <div className="hero-badge inline-flex items-center gap-2.5 sm:gap-3 mb-6 sm:mb-8 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full border border-ivory/15 bg-white/5 backdrop-blur-md w-fit">
-            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.25em] text-ivory/80 font-mono font-medium">
-              Boutique Digital Marketing &amp; Strategy
-            </span>
-          </div>
-
+        <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-center px-6 sm:px-8 md:px-12 pt-32 sm:pt-36 md:pt-40 pb-8 relative z-10">
           <h1
             ref={heroTitleRef}
-            className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[6rem] leading-[1.05] tracking-tight max-w-5xl"
+            className="font-serif w-full max-w-6xl text-[clamp(4rem,11vw,11rem)] sm:text-[clamp(5rem,10vw,12rem)] md:text-[clamp(6.5rem,9.5vw,14rem)] lg:text-[clamp(7.5rem,10.5vw,16rem)] leading-[0.82] tracking-[-0.04em]"
           >
             <span className="block font-normal">Quiet Power.</span>
-            <span className="block text-primary italic font-normal">Loud Impact.</span>
+            <span className="block text-primary italic font-normal mt-2 sm:mt-3 lg:mt-4">Loud Impact.</span>
           </h1>
 
-          <div className="hero-sub mt-8 sm:mt-12 border-t border-ivory/10 pt-6 sm:pt-8">
-            <p className="text-base sm:text-lg md:text-xl text-ivory/70 font-light leading-relaxed max-w-xl">
+          <div className="hero-sub mt-8 sm:mt-12 border-t border-ivory/10 pt-6 sm:pt-8 max-w-2xl">
+            <p className="text-base sm:text-lg md:text-xl text-ivory/70 font-light leading-relaxed">
               Branvoy is an editorial digital agency engineered for brands that prefer measurable authority over volume. We craft restrained campaigns that convert deeply.
             </p>
             <div className="mt-6 sm:mt-8">
