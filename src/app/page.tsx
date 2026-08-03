@@ -133,13 +133,13 @@ export default function HomePage() {
     });
   }, { scope: heroRef });
 
-  // Pinned Horizontal Scroll — desktop only (>= 768px)
+  // Pinned Horizontal Scroll — desktop & mobile
   useGSAP(() => {
     if (!horizontalSectionRef.current || !horizontalTrackRef.current) return;
     const mm = gsap.matchMedia();
 
-    // Only activate horizontal scroll on desktop
-    mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
+    // Activate horizontal scroll on all devices (mobile & desktop)
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
       const track = horizontalTrackRef.current!;
       const totalScroll = track.scrollWidth - window.innerWidth;
 
@@ -268,8 +268,7 @@ export default function HomePage() {
       </section>
 
       {/* CASE STUDIES SECTION
-          - Desktop (≥ md): GSAP pinned horizontal scroll
-          - Mobile (< md): Native touch scroll with snap */}
+          - Pinned horizontal scroll for both desktop and mobile */}
       <section
         ref={horizontalSectionRef}
         className="relative bg-ink text-ivory overflow-hidden"
@@ -280,17 +279,17 @@ export default function HomePage() {
             <span className="text-xs font-mono uppercase tracking-[0.25em] text-primary font-bold">
               02 / Featured Case Studies
             </span>
-            <span className="text-xs text-ivory/60 font-mono hidden md:inline">
+            <span className="text-xs text-ivory/60 font-mono hidden sm:inline">
               [ PINNED HORIZONTAL ARCHIVE ]
             </span>
           </div>
 
-          {/* Progress bar — only shown on desktop */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* Progress bar — visible on mobile and desktop */}
+          <div className="flex items-center gap-3 sm:gap-4">
             <span ref={progressTextRef} className="text-xs font-mono text-ivory/80 font-medium">
               0%
             </span>
-            <div className="w-36 md:w-48 h-1.5 bg-ivory/20 rounded-full overflow-hidden">
+            <div className="w-24 sm:w-36 md:w-48 h-1.5 bg-ivory/20 rounded-full overflow-hidden">
               <div
                 ref={progressBarRef}
                 className="h-full bg-primary transition-all duration-75"
@@ -300,25 +299,21 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Desktop: GSAP horizontal track | Mobile: native horizontal scroll */}
-        {/* The outer div is the GSAP pin target on desktop */}
-        <div className="md:min-h-screen md:flex md:flex-col md:justify-center">
+        {/* Outer wrapper for pinned horizontal scroll */}
+        <div className="min-h-[70vh] md:min-h-screen flex flex-col justify-center py-6 md:py-0">
           <div
             ref={horizontalTrackRef}
             className="
               flex gap-5 sm:gap-6 md:gap-10
               px-5 sm:px-8 md:px-16
-              pb-8 md:pb-0
-              pt-6 md:pt-0
-              md:items-center
-              md:w-max
-              md:h-[72vh] md:min-h-[420px] md:max-h-[580px]
+              items-center
+              w-max
+              h-[68vh] sm:h-[70vh] md:h-[72vh] min-h-[450px] md:min-h-[420px] md:max-h-[580px]
               will-change-transform
-              case-scroll-container md:overflow-visible
             "
           >
             {/* Introductory Card */}
-            <div className="case-scroll-card w-[78vw] sm:w-[55vw] md:w-[38vw] lg:w-[32vw] flex-shrink-0 flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-md rounded-sm md:h-full min-h-[340px] md:min-h-0 relative overflow-hidden">
+            <div className="case-scroll-card w-[88vw] sm:w-[65vw] md:w-[38vw] lg:w-[32vw] flex-shrink-0 flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-md rounded-sm h-full min-h-[440px] md:min-h-0 relative overflow-hidden">
               <div className="absolute -right-4 -bottom-4 font-serif text-7xl md:text-8xl text-ivory/5 select-none pointer-events-none">
                 00
               </div>
@@ -335,7 +330,7 @@ export default function HomePage() {
                   Explore how our minimalist visual systems and razor-sharp digital targeting translated into verified market leadership.
                 </p>
                 <div className="text-[10px] sm:text-xs font-mono text-ivory/40 uppercase tracking-widest">
-                  ← Swipe to navigate →
+                  Scroll down to explore →
                 </div>
               </div>
             </div>
@@ -344,7 +339,7 @@ export default function HomePage() {
             {featuredCases.map((item) => (
               <div
                 key={item.id}
-                className="case-scroll-card w-[78vw] sm:w-[60vw] md:w-[46vw] lg:w-[40vw] flex-shrink-0 md:h-full min-h-[340px] md:min-h-0 group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-all duration-300 overflow-hidden shadow-2xl"
+                className="case-scroll-card w-[88vw] sm:w-[70vw] md:w-[46vw] lg:w-[40vw] flex-shrink-0 h-full min-h-[440px] md:min-h-0 group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-all duration-300 overflow-hidden shadow-2xl"
               >
                 {/* Background Watermark Index */}
                 <div className="absolute top-4 right-6 sm:right-8 font-serif text-5xl sm:text-6xl md:text-7xl text-ivory/10 font-bold select-none pointer-events-none group-hover:text-primary/20 transition-colors">
@@ -352,13 +347,13 @@ export default function HomePage() {
                 </div>
 
                 {/* Duotone Background Image Container */}
-                <div className="absolute inset-0 duotone opacity-40 group-hover:opacity-75 transition-opacity duration-500 pointer-events-none">
+                <div className="absolute inset-0 duotone opacity-55 md:opacity-40 group-hover:opacity-75 transition-opacity duration-500 pointer-events-none">
                   <Image
                     src={item.image}
                     alt={item.title}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 78vw, 42vw"
+                    sizes="(max-width: 768px) 88vw, 42vw"
                   />
                 </div>
 
@@ -404,7 +399,7 @@ export default function HomePage() {
             ))}
 
             {/* Outro CTA Card */}
-            <div className="case-scroll-card w-[78vw] sm:w-[55vw] md:w-[36vw] lg:w-[28vw] flex-shrink-0 flex flex-col justify-center items-center text-center p-6 sm:p-8 md:p-10 border border-primary/50 bg-primary/10 rounded-sm md:h-full min-h-[340px] md:min-h-0">
+            <div className="case-scroll-card w-[88vw] sm:w-[65vw] md:w-[36vw] lg:w-[28vw] flex-shrink-0 flex flex-col justify-center items-center text-center p-6 sm:p-8 md:p-10 border border-primary/50 bg-primary/10 rounded-sm h-full min-h-[440px] md:min-h-0">
               <span className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory mb-6 leading-tight">
                 Ready for measurable market authority?
               </span>
@@ -416,13 +411,6 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-        </div>
-
-        {/* Mobile scroll indicator */}
-        <div className="md:hidden flex justify-center gap-1.5 pb-6">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <span key={i} className="w-1.5 h-1.5 rounded-full bg-ivory/20" />
-          ))}
         </div>
       </section>
 
