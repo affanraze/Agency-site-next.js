@@ -188,8 +188,8 @@ export default function ContactPage() {
                 <div className="space-y-6 text-sm">
                   <div>
                     <span className="block text-xs font-mono text-ink/50 uppercase tracking-widest mb-1">Email</span>
-                    <a href="mailto:branvoy.agency@gmail.com" className="text-lg font-serif text-primary hover:underline">
-                      branvoy.agency@gmail.com
+                    <a href="mailto:hello@branvoy.agency" className="text-lg font-serif text-primary hover:underline">
+                      hello@branvoy.agency
                     </a>
                   </div>
                   <div>
@@ -211,8 +211,8 @@ export default function ContactPage() {
                 <h3 className="font-serif text-3xl text-ivory mb-6">Agency Headquarters</h3>
                 <div className="space-y-6 text-sm">
                   <div>
-                    <span className="font-serif text-xl block text-primary mb-1">Faisalabad Studio</span>
-                    <span className="text-ivory/60 text-xs block font-light">Faisalabad, Punjab, Pakistan</span>
+                    <span className="font-serif text-xl block text-primary mb-1">Dubai Studio</span>
+                    <span className="text-ivory/60 text-xs block font-light">Dubai, United Arab Emirates</span>
                   </div>
                 </div>
               </div>

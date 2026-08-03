@@ -1,0 +1,181 @@
+{
+  "team": [
+    {
+      "id": 1,
+      "name": "Team Member 1",
+      "role": "Founder & CEO",
+      "image": "/team/team-1.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Team Member 2",
+      "role": "Head of Strategy",
+      "image": "/team/team-2.jpg"
+    },
+    {
+      "id": 3,
+      "name": "Team Member 3",
+      "role": "Creative Director",
+      "image": "/team/team-3.jpg"
+    },
+    {
+      "id": 4,
+      "name": "Team Member 4",
+      "role": "Head of Performance Marketing",
+      "image": "/team/team-4.jpg"
+    }
+  ],
+  "services": [
+    {
+      "id": "01",
+      "title": "Brand Strategy & Positioning",
+      "tagline": "Definitive clarity in crowded markets.",
+      "description": "We extract your brand core and translate it into a compelling market narrative. Our strategic frameworks eliminate ambiguity and set the foundation for long-term category equity.",
+      "deliverables": [
+        "Brand Identity & Narrative Architecture",
+        "Market & Competitor Positioning",
+        "Tone of Voice & Messaging Systems",
+        "Brand Visual Guidelines"
+      ],
+      "price": ""
+    },
+    {
+      "id": "02",
+      "title": "Performance Marketing & Paid Media",
+      "tagline": "Capital allocation tuned for profitable growth.",
+      "description": "We run multi-channel paid acquisition with absolute financial discipline. No vanity metrics or bloated ad budgets—just clear CAC-to-LTV ratio scaling across Meta, Google, and emerging platforms.",
+      "deliverables": [
+        "Paid Social (Meta, TikTok, LinkedIn)",
+        "Search Engine Marketing (Google, Bing)",
+        "Funnel Conversion Optimization",
+        "Attribution & Custom Dashboards"
+      ],
+      "price": ""
+    },
+    {
+      "id": "03",
+      "title": "Content & Editorial Production",
+      "tagline": "High-craft storytelling that commands attention.",
+      "description": "We produce editorial-grade video, photography, and written assets designed to elevate brand perception while driving immediate audience response.",
+      "deliverables": [
+        "Editorial Photography & Art Direction",
+        "Short-Form & Campaign Video",
+        "Copywriting & Content Architecture",
+        "Social Content Systems"
+      ],
+      "price": ""
+    },
+    {
+      "id": "04",
+      "title": "Web & Digital Product Design",
+      "tagline": "Fast, quiet, elegant digital flagships.",
+      "description": "We build high-converting websites and digital experiences engineered with Next.js and GSAP micro-animations. Generous whitespace, refined typography, and sub-second load times.",
+      "deliverables": [
+        "Next.js & React Web Applications",
+        "Headless E-commerce Solutions",
+        "Interactive Micro-Animations & GSAP",
+        "SEO & Performance Audits"
+      ],
+      "price": ""
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "Aethel Luxury Goods",
+      "category": "Luxury",
+      "services": "Brand Identity & Performance",
+      "year": "2025",
+      "metric": "+184%",
+      "metricLabel": "Conversion Lift",
+      "image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200",
+      "summary": "Complete brand repositioning and editorial paid social strategy for a heritage leather goods brand.",
+      "clientQuote": "Branvoy transformed our acquisition from chaotic ad spend into a highly predictable profit machine.",
+      "results": ["184% Organic conversion lift", "3.8x ROAS across Meta paid social", "$1.4M additional net ARR"]
+    },
+    {
+      "id": 2,
+      "title": "Verde Architecture",
+      "category": "B2B",
+      "services": "Identity & Acquisition",
+      "year": "2025",
+      "metric": "3.4x",
+      "metricLabel": "Blended ROAS",
+      "image": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1200",
+      "summary": "Refined B2B lead generation pipeline and digital presence for sustainable architecture leaders.",
+      "clientQuote": "Their restraint and visual identity instantly elevated our market positioning above legacy competitors.",
+      "results": ["3.4x ROAS on LinkedIn & Search", "142 High-intent enterprise RFPs", "45% reduction in CAC"]
+    },
+    {
+      "id": 3,
+      "title": "NORDIC Audio Tech",
+      "category": "Tech",
+      "services": "Product Launch & Global Paid Search",
+      "year": "2024",
+      "metric": "$4.2M",
+      "metricLabel": "First Quarter Revenue",
+      "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=1200",
+      "summary": "Global direct-to-consumer launch strategy for high-fidelity noise-canceling headphones.",
+      "clientQuote": "Global D2C launch strategy delivered $4.2M in launch revenue with zero vanity spend spikes.",
+      "results": ["$4.2M total launch revenue", "28k units sold globally", "4.1x Google Search ROAS"]
+    },
+    {
+      "id": 4,
+      "title": "Maison Solstice",
+      "category": "Luxury",
+      "services": "Content & Social Architecture",
+      "year": "2024",
+      "metric": "2.1M",
+      "metricLabel": "Targeted Reach",
+      "image": "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=1200",
+      "summary": "High-craft editorial video series and social media campaign driving high-ticket organic sales.",
+      "clientQuote": "The editorial video content built immediate authority with our high-net-worth audience.",
+      "results": ["2.1M qualified organic impressions", "64% repeat customer rate", "5.2x engagement rate lift"]
+    },
+    {
+      "id": 5,
+      "title": "KROMA Skincare",
+      "category": "E-Commerce",
+      "services": "Full Funnel Growth",
+      "year": "2024",
+      "metric": "+240%",
+      "metricLabel": "YoY Revenue Scale",
+      "image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=1200",
+      "summary": "Scaling D2C skincare via focused Meta creative testing and automated retargeting flows.",
+      "clientQuote": "Scaled our daily orders 3x while actually improving our customer acquisition cost metrics.",
+      "results": ["240% YoY Revenue expansion", "$850k monthly ad spend scaled", "68% retention rate at 90 days"]
+    }
+  ],
+  "pricing": [
+    {
+      "id": 1,
+      "name": "Starter",
+      "price": "$2,500",
+      "period": "/ month",
+      "description": "Perfect for growing brands ready to establish market presence.",
+      "features": ["Brand strategy audit", "1 paid channel management", "Monthly reporting", "Email support"]
+    },
+    {
+      "id": 2,
+      "name": "Growth",
+      "price": "$5,000",
+      "period": "/ month",
+      "description": "For established brands scaling their digital authority.",
+      "features": ["Full brand positioning", "3 paid channel management", "Content production", "Weekly reporting", "Dedicated account manager"]
+    },
+    {
+      "id": 3,
+      "name": "Enterprise",
+      "price": "Custom",
+      "period": "",
+      "description": "Bespoke engagement for brands demanding senior partner involvement.",
+      "features": ["Full-service brand partnership", "All channels managed", "Unlimited creative production", "Daily reporting", "Direct senior partner access"]
+    }
+  ],
+  "siteSettings": {
+    "heroHeading": "Quiet Power. Loud Impact.",
+    "heroSubtext": "Branvoy is an editorial digital agency engineered for brands that prefer measurable authority over volume.",
+    "aboutHeading": "Built on the discipline of quiet authority.",
+    "servicesHeading": "Capabilities engineered for lasting influence."
+  }
+}

@@ -133,12 +133,13 @@ export default function HomePage() {
     });
   }, { scope: heroRef });
 
-  // Pinned Horizontal Scroll Section — Direct DOM progress update to eliminate 60fps re-render lag
+  // Pinned Horizontal Scroll — desktop only (>= 768px)
   useGSAP(() => {
     if (!horizontalSectionRef.current || !horizontalTrackRef.current) return;
     const mm = gsap.matchMedia();
 
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
+    // Only activate horizontal scroll on desktop
+    mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
       const track = horizontalTrackRef.current!;
       const totalScroll = track.scrollWidth - window.innerWidth;
 
@@ -193,16 +194,17 @@ export default function HomePage() {
         ref={heroRef}
         className="relative min-h-screen bg-ink text-ivory flex flex-col justify-start overflow-hidden"
       >
-        {/* GPU-native Radial Gradient Ambient Accent (Zero blur overhead) */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] sm:w-[500px] md:w-[600px] h-[300px] sm:h-[500px] md:h-[600px] bg-[radial-gradient(circle_at_center,rgba(74,106,64,0.25)_0%,transparent_70%)] pointer-events-none" />
+        {/* Radial Gradient Ambient Accent */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] sm:w-[500px] md:w-[700px] h-[300px] sm:h-[500px] md:h-[700px] bg-[radial-gradient(circle_at_center,rgba(74,106,64,0.22)_0%,transparent_70%)] pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col justify-center px-6 sm:px-8 md:px-12 pt-32 sm:pt-36 md:pt-40 pb-8 relative z-10">
+        <div className="w-full flex-1 flex flex-col justify-center px-5 sm:px-8 md:px-12 pt-28 sm:pt-32 md:pt-36 pb-8 relative z-10">
           <h1
             ref={heroTitleRef}
-            className="font-serif w-full max-w-6xl text-[clamp(4rem,11vw,11rem)] sm:text-[clamp(5rem,10vw,12rem)] md:text-[clamp(6.5rem,9.5vw,14rem)] lg:text-[clamp(7.5rem,10.5vw,16rem)] leading-[0.82] tracking-[-0.04em]"
+            className="font-serif w-full leading-[0.85] tracking-[-0.04em]"
+            style={{ fontSize: 'clamp(4.5rem, 14vw, 18rem)' }}
           >
             <span className="block font-normal">Quiet Power.</span>
-            <span className="block text-primary italic font-normal mt-2 sm:mt-3 lg:mt-4">Loud Impact.</span>
+            <span className="block text-primary italic font-normal mt-1 sm:mt-2">Loud Impact.</span>
           </h1>
 
           <div className="hero-sub mt-8 sm:mt-12 border-t border-ivory/10 pt-6 sm:pt-8 max-w-2xl">
@@ -222,8 +224,8 @@ export default function HomePage() {
         </div>
 
         {/* Hero Bottom Bar */}
-        <div className="max-w-7xl mx-auto w-full px-6 sm:px-8 md:px-12 py-6 sm:py-8 border-t border-ivory/10 flex flex-col sm:flex-row items-start sm:items-center justify-between text-[11px] sm:text-xs text-ivory/40 gap-3 sm:gap-4 font-mono">
-          <div>FAISALABAD, PAKISTAN</div>
+        <div className="w-full px-5 sm:px-8 md:px-12 py-6 sm:py-8 border-t border-ivory/10 flex flex-col sm:flex-row items-start sm:items-center justify-between text-[11px] sm:text-xs text-ivory/40 gap-3 sm:gap-4 font-mono">
+          <div>DUBAI, UAE</div>
           <div>EST. 2022</div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-primary" />
@@ -265,13 +267,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* SPECTACLE MOMENT: PINNED HORIZONTAL SCROLL SECTION */}
+      {/* CASE STUDIES SECTION
+          - Desktop (≥ md): GSAP pinned horizontal scroll
+          - Mobile (< md): Native touch scroll with snap */}
       <section
         ref={horizontalSectionRef}
-        className="relative bg-ink text-ivory overflow-hidden min-h-screen flex flex-col justify-between pt-24 sm:pt-28 pb-8"
+        className="relative bg-ink text-ivory overflow-hidden"
       >
-        {/* Top Sticky Header Controls */}
-        <div className="px-6 sm:px-8 md:px-12 z-30 flex items-center justify-between border-b border-ivory/10 pb-4 sm:pb-6 w-full max-w-7xl mx-auto">
+        {/* Header always visible */}
+        <div className="px-5 sm:px-8 md:px-12 pt-16 sm:pt-20 md:pt-24 pb-4 sm:pb-6 z-30 flex items-center justify-between border-b border-ivory/10 w-full max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
             <span className="text-xs font-mono uppercase tracking-[0.25em] text-primary font-bold">
               02 / Featured Case Studies
@@ -281,12 +285,12 @@ export default function HomePage() {
             </span>
           </div>
 
-          {/* Direct DOM updated Progress fill bar */}
-          <div className="flex items-center gap-4">
+          {/* Progress bar — only shown on desktop */}
+          <div className="hidden md:flex items-center gap-4">
             <span ref={progressTextRef} className="text-xs font-mono text-ivory/80 font-medium">
               0%
             </span>
-            <div className="w-24 sm:w-36 md:w-48 h-1.5 bg-ivory/20 rounded-full overflow-hidden">
+            <div className="w-36 md:w-48 h-1.5 bg-ivory/20 rounded-full overflow-hidden">
               <div
                 ref={progressBarRef}
                 className="h-full bg-primary transition-all duration-75"
@@ -296,109 +300,129 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Horizontal Track */}
-        <div
-          ref={horizontalTrackRef}
-          className="flex flex-1 gap-6 sm:gap-8 md:gap-12 px-5 sm:px-8 md:px-24 items-center w-max h-[72vh] min-h-[420px] max-h-[560px] will-change-transform"
-        >
-          {/* Introductory Card */}
-          <div className="w-[85vw] sm:w-[65vw] md:w-[45vw] lg:w-[36vw] flex-shrink-0 flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-md rounded-sm h-full relative overflow-hidden">
-            <div className="absolute -right-4 -bottom-4 font-serif text-7xl md:text-8xl text-ivory/5 select-none pointer-events-none">
-              00
-            </div>
-            <div>
-              <span className="text-xs font-mono text-primary font-bold uppercase tracking-widest">
-                Selected Portfolio
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-ivory mt-4 sm:mt-6 leading-tight">
-                Case studies built on proof, not promises.
-              </h3>
-            </div>
-            <div className="space-y-4 relative z-10">
-              <p className="text-xs sm:text-sm text-ivory/70 leading-relaxed font-light">
-                Explore how our minimalist visual systems and razor-sharp digital targeting translated into verified market leadership.
-              </p>
-              <div className="text-[10px] sm:text-xs font-mono text-ivory/40 uppercase tracking-widest">
-                ← Scroll vertically to navigate →
+        {/* Desktop: GSAP horizontal track | Mobile: native horizontal scroll */}
+        {/* The outer div is the GSAP pin target on desktop */}
+        <div className="md:min-h-screen md:flex md:flex-col md:justify-center">
+          <div
+            ref={horizontalTrackRef}
+            className="
+              flex gap-5 sm:gap-6 md:gap-10
+              px-5 sm:px-8 md:px-16
+              pb-8 md:pb-0
+              pt-6 md:pt-0
+              md:items-center
+              md:w-max
+              md:h-[72vh] md:min-h-[420px] md:max-h-[580px]
+              will-change-transform
+              case-scroll-container md:overflow-visible
+            "
+          >
+            {/* Introductory Card */}
+            <div className="case-scroll-card w-[78vw] sm:w-[55vw] md:w-[38vw] lg:w-[32vw] flex-shrink-0 flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-md rounded-sm md:h-full min-h-[340px] md:min-h-0 relative overflow-hidden">
+              <div className="absolute -right-4 -bottom-4 font-serif text-7xl md:text-8xl text-ivory/5 select-none pointer-events-none">
+                00
               </div>
-            </div>
-          </div>
-
-          {/* Case Cards */}
-          {featuredCases.map((item) => (
-            <div
-              key={item.id}
-              className="w-[85vw] sm:w-[65vw] md:w-[50vw] lg:w-[42vw] flex-shrink-0 h-full group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-all duration-300 overflow-hidden shadow-2xl"
-            >
-              {/* Background Watermark Index */}
-              <div className="absolute top-4 right-6 sm:right-8 font-serif text-5xl sm:text-6xl md:text-7xl text-ivory/10 font-bold select-none pointer-events-none group-hover:text-primary/20 transition-colors">
-                {item.id}
-              </div>
-
-              {/* Duotone Background Image Container */}
-              <div className="absolute inset-0 duotone opacity-40 group-hover:opacity-75 transition-opacity duration-500 pointer-events-none">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 85vw, 42vw"
-                />
-              </div>
-
-              <div className="relative z-10 flex justify-between items-start">
-                <span className="font-mono text-xs text-primary font-bold bg-ink/80 px-3 py-1 rounded-full border border-primary/30">
-                  {item.id}
+              <div>
+                <span className="text-xs font-mono text-primary font-bold uppercase tracking-widest">
+                  Selected Portfolio
                 </span>
-                <span className="text-xs uppercase tracking-wider text-ivory/80 bg-ink/80 backdrop-blur-md px-3 py-1 rounded-full border border-ivory/10 font-mono">
-                  {item.year}
-                </span>
+                <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-ivory mt-4 sm:mt-6 leading-tight">
+                  Case studies built on proof, not promises.
+                </h3>
               </div>
-
-              <div className="relative z-10 my-auto py-3 sm:py-5">
-                <div className="text-[10px] sm:text-xs uppercase tracking-widest font-mono text-primary mb-1.5">
-                  {item.category}
-                </div>
-                <h4 className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory group-hover:text-primary transition-colors duration-300">
-                  {item.title}
-                </h4>
-                <p className="text-xs sm:text-sm text-ivory/80 mt-2 max-w-md font-light leading-relaxed">
-                  {item.summary}
+              <div className="space-y-4 relative z-10">
+                <p className="text-xs sm:text-sm text-ivory/70 leading-relaxed font-light">
+                  Explore how our minimalist visual systems and razor-sharp digital targeting translated into verified market leadership.
                 </p>
-              </div>
-
-              <div className="relative z-10 pt-4 border-t border-ivory/20 flex items-center justify-between bg-ink/40 p-4 sm:p-5 -mx-6 sm:-mx-8 md:-mx-10 -mb-6 sm:-mb-8 md:-mb-10 rounded-b-sm">
-                <div>
-                  <div className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory font-normal">
-                    {item.metric}
-                  </div>
-                  <div className="text-[10px] font-mono text-ivory/60 uppercase tracking-wider">
-                    {item.metricLabel}
-                  </div>
+                <div className="text-[10px] sm:text-xs font-mono text-ivory/40 uppercase tracking-widest">
+                  ← Swipe to navigate →
                 </div>
-
-                <Link
-                  href="/work"
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-ivory/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300"
-                >
-                  <span className="text-ivory text-base sm:text-lg">→</span>
-                </Link>
               </div>
             </div>
-          ))}
 
-          {/* Outro CTA Card */}
-          <div className="w-[85vw] sm:w-[65vw] md:w-[40vw] lg:w-[32vw] flex-shrink-0 flex flex-col justify-center items-center text-center p-6 sm:p-8 md:p-10 border border-primary/50 bg-primary/10 rounded-sm h-full">
-            <span className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory mb-6 leading-tight">
-              Ready for measurable market authority?
-            </span>
-            <Link
-              href="/contact"
-              className="px-6 sm:px-8 py-3.5 sm:py-4 bg-primary text-ivory rounded-full text-xs font-semibold uppercase tracking-widest hover:bg-ivory hover:text-ink transition-all duration-300"
-            >
-              Start Project Inquiry →
-            </Link>
+            {/* Case Cards */}
+            {featuredCases.map((item) => (
+              <div
+                key={item.id}
+                className="case-scroll-card w-[78vw] sm:w-[60vw] md:w-[46vw] lg:w-[40vw] flex-shrink-0 md:h-full min-h-[340px] md:min-h-0 group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-all duration-300 overflow-hidden shadow-2xl"
+              >
+                {/* Background Watermark Index */}
+                <div className="absolute top-4 right-6 sm:right-8 font-serif text-5xl sm:text-6xl md:text-7xl text-ivory/10 font-bold select-none pointer-events-none group-hover:text-primary/20 transition-colors">
+                  {item.id}
+                </div>
+
+                {/* Duotone Background Image Container */}
+                <div className="absolute inset-0 duotone opacity-40 group-hover:opacity-75 transition-opacity duration-500 pointer-events-none">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 78vw, 42vw"
+                  />
+                </div>
+
+                <div className="relative z-10 flex justify-between items-start">
+                  <span className="font-mono text-xs text-primary font-bold bg-ink/80 px-3 py-1 rounded-full border border-primary/30">
+                    {item.id}
+                  </span>
+                  <span className="text-xs uppercase tracking-wider text-ivory/80 bg-ink/80 backdrop-blur-md px-3 py-1 rounded-full border border-ivory/10 font-mono">
+                    {item.year}
+                  </span>
+                </div>
+
+                <div className="relative z-10 my-auto py-3 sm:py-5">
+                  <div className="text-[10px] sm:text-xs uppercase tracking-widest font-mono text-primary mb-1.5">
+                    {item.category}
+                  </div>
+                  <h4 className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory group-hover:text-primary transition-colors duration-300">
+                    {item.title}
+                  </h4>
+                  <p className="text-xs sm:text-sm text-ivory/80 mt-2 max-w-md font-light leading-relaxed">
+                    {item.summary}
+                  </p>
+                </div>
+
+                <div className="relative z-10 pt-4 border-t border-ivory/20 flex items-center justify-between bg-ink/40 p-4 sm:p-5 -mx-6 sm:-mx-8 md:-mx-10 -mb-6 sm:-mb-8 md:-mb-10 rounded-b-sm">
+                  <div>
+                    <div className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory font-normal">
+                      {item.metric}
+                    </div>
+                    <div className="text-[10px] font-mono text-ivory/60 uppercase tracking-wider">
+                      {item.metricLabel}
+                    </div>
+                  </div>
+
+                  <Link
+                    href="/work"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-ivory/30 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300"
+                  >
+                    <span className="text-ivory text-base sm:text-lg">→</span>
+                  </Link>
+                </div>
+              </div>
+            ))}
+
+            {/* Outro CTA Card */}
+            <div className="case-scroll-card w-[78vw] sm:w-[55vw] md:w-[36vw] lg:w-[28vw] flex-shrink-0 flex flex-col justify-center items-center text-center p-6 sm:p-8 md:p-10 border border-primary/50 bg-primary/10 rounded-sm md:h-full min-h-[340px] md:min-h-0">
+              <span className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory mb-6 leading-tight">
+                Ready for measurable market authority?
+              </span>
+              <Link
+                href="/contact"
+                className="px-6 sm:px-8 py-3.5 sm:py-4 bg-primary text-ivory rounded-full text-xs font-semibold uppercase tracking-widest hover:bg-ivory hover:text-ink transition-all duration-300"
+              >
+                Start Project Inquiry →
+              </Link>
+            </div>
           </div>
+        </div>
+
+        {/* Mobile scroll indicator */}
+        <div className="md:hidden flex justify-center gap-1.5 pb-6">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <span key={i} className="w-1.5 h-1.5 rounded-full bg-ivory/20" />
+          ))}
         </div>
       </section>
 
@@ -477,7 +501,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* METRICS & PROOF TICKER */}
+      {/* METRICS & PROOF */}
       <section ref={revealRef} className="py-16 sm:py-20 bg-ink text-ivory px-5 sm:px-8 md:px-12 border-t border-ivory/10">
         <div className="max-w-[1400px] mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-ivory/10 border-y border-ivory/10">
@@ -516,7 +540,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FINAL EDITORIAL CALL TO ACTION */}
+      {/* FINAL CTA */}
       <section className="py-16 sm:py-24 md:py-28 px-5 sm:px-8 md:px-12 bg-ivory text-ink text-center">
         <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
           <FadeUp>

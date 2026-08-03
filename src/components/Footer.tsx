@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 const footerLinks = {
   navigation: [
@@ -20,6 +21,10 @@ const footerLinks = {
 };
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith('/admin')) return null;
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -103,10 +108,10 @@ export default function Footer() {
             </h4>
             <div className="space-y-3 text-sm">
               <a
-                href="mailto:branvoy.agency@gmail.com"
+                href="mailto:hello@branvoy.agency"
                 className="block text-ivory/70 hover:text-primary transition-colors"
               >
-                branvoy.agency@gmail.com
+                hello@branvoy.agency
               </a>
               <a
                 href="https://wa.me/"
@@ -126,8 +131,8 @@ export default function Footer() {
               Headquarters
             </h4>
             <div className="text-xs font-mono">
-              <div className="text-ivory font-semibold mb-1">FAISALABAD, PK</div>
-              <div className="text-ivory/50">PKT / UTC+5</div>
+              <div className="text-ivory font-semibold mb-1">DUBAI, UAE</div>
+              <div className="text-ivory/50">GST / UTC+4</div>
             </div>
           </div>
         </div>

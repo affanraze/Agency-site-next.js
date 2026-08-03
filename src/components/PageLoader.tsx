@@ -45,6 +45,9 @@ export default function PageLoader() {
     const loader = loaderRef.current;
     if (!loader) return;
 
+    // Detect low-power mobile to simplify animation
+    const isMobile = window.innerWidth < 768;
+
     // Lock body scroll during load
     document.body.style.overflow = 'hidden';
 
@@ -62,34 +65,48 @@ export default function PageLoader() {
       },
     });
 
-    // ── Phase 1: Ambient glow pulse in
-    tl.fromTo(
-      glowRef.current,
-      { scale: 0.4, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 1.2, ease: 'power2.out' }
-    );
+    // ── Phase 1: Ambient glow pulse in (skip on mobile for performance)
+    if (!isMobile) {
+      tl.fromTo(
+        glowRef.current,
+        { scale: 0.4, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 1.2, ease: 'power2.out' }
+      );
+    } else {
+      // On mobile just show glow quickly
+      if (glowRef.current) {
+        glowRef.current.style.opacity = '0.6';
+        glowRef.current.style.transform = 'scale(1)';
+      }
+    }
 
-    // ── Phase 2: Letters stagger in from below
+    // ── Phase 2: Letters stagger in from below — NO blur filter on mobile (kills performance)
     tl.fromTo(
       letterRefs.current.filter(Boolean),
-      { y: 80, opacity: 0, rotateX: -60, filter: 'blur(12px)' },
+      {
+        y: isMobile ? 40 : 80,
+        opacity: 0,
+        rotateX: isMobile ? 0 : -60,
+        // Blur only on desktop — mobile GPU can't handle filter transitions smoothly
+        ...(isMobile ? {} : { filter: 'blur(8px)' }),
+      },
       {
         y: 0,
         opacity: 1,
         rotateX: 0,
-        filter: 'blur(0px)',
+        ...(isMobile ? {} : { filter: 'blur(0px)' }),
         stagger: 0.06,
-        duration: 0.9,
+        duration: isMobile ? 0.6 : 0.9,
         ease: 'power3.out',
       },
-      '-=0.6'
+      isMobile ? '0' : '-=0.6'
     );
 
     // ── Phase 3: Tagline & dots fade in
     tl.fromTo(
       taglineRef.current,
       { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
       '-=0.3'
     );
 
@@ -97,7 +114,7 @@ export default function PageLoader() {
       dotsRef.current,
       { opacity: 0 },
       { opacity: 1, duration: 0.4, ease: 'power2.out' },
-      '-=0.5'
+      '-=0.4'
     );
 
     // ── Phase 4: Progress bar counts up 0→100
@@ -106,7 +123,7 @@ export default function PageLoader() {
       progressObj,
       {
         value: 100,
-        duration: 1.6,
+        duration: isMobile ? 1.2 : 1.6,
         ease: 'power1.inOut',
         onUpdate() {
           const v = Math.round(progressObj.value);
@@ -117,20 +134,22 @@ export default function PageLoader() {
       '-=0.2'
     );
 
-    // ── Phase 5: Brief hold, then glow expands
-    tl.to(glowRef.current, { scale: 1.5, opacity: 0.6, duration: 0.4, ease: 'power2.in' }, '+=0.15');
+    // ── Phase 5: Brief hold, then glow expands (desktop only)
+    if (!isMobile) {
+      tl.to(glowRef.current, { scale: 1.5, opacity: 0.6, duration: 0.4, ease: 'power2.in' }, '+=0.15');
+    }
 
-    // ── Phase 6: Letters explode outward + fade
+    // ── Phase 6: Letters fade out
     tl.to(
       letterRefs.current.filter(Boolean),
       {
         y: -30,
         opacity: 0,
         stagger: 0.03,
-        duration: 0.5,
+        duration: 0.45,
         ease: 'power2.in',
       },
-      '-=0.25'
+      isMobile ? '+=0.1' : '-=0.25'
     );
 
     tl.to([taglineRef.current, dotsRef.current], { opacity: 0, duration: 0.3, ease: 'power2.in' }, '<');
@@ -163,7 +182,7 @@ export default function PageLoader() {
     <div
       ref={loaderRef}
       aria-hidden="true"
-      style={{ fontFamily: "'Inter', sans-serif" }}
+      style={{ fontFamily: "'Manrope', sans-serif" }}
       className="fixed inset-0 z-[99999] pointer-events-none"
     >
       {/* Top half panel */}
@@ -190,10 +209,10 @@ export default function PageLoader() {
         {/* Ambient radial glow */}
         <div
           ref={glowRef}
-          className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+          className="absolute w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] rounded-full pointer-events-none"
           style={{
             background: 'radial-gradient(circle at center, rgba(74,106,64,0.35) 0%, transparent 70%)',
-            filter: 'blur(40px)',
+            filter: 'blur(30px)',
             opacity: 0,
           }}
         />
@@ -209,7 +228,7 @@ export default function PageLoader() {
               ref={(el) => { letterRefs.current[i] = el; }}
               style={{
                 fontFamily: "'Instrument Serif', Georgia, serif",
-                fontSize: 'clamp(4rem, 12vw, 9rem)',
+                fontSize: 'clamp(3rem, 12vw, 9rem)',
                 lineHeight: 1,
                 color: '#F9FAF5',
                 display: 'inline-block',
@@ -251,7 +270,7 @@ export default function PageLoader() {
         </div>
 
         {/* Progress bar + percentage */}
-        <div className="absolute bottom-10 left-0 right-0 px-8 sm:px-16">
+        <div className="absolute bottom-8 left-0 right-0 px-6 sm:px-16">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-mono uppercase tracking-widest text-[#F9FAF5]/30">
               Loading

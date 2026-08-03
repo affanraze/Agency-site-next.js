@@ -28,22 +28,24 @@ const principles = [
 
 const team = [
   {
-    name: 'Hassan Goreja',
-    role: 'Head of Marketing & Paid Ads',
-    bio: 'Performance marketing specialist and media buyer who leads acquisition strategy, multi-channel ad scaling, and ROI optimization.',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800',
+    name: 'Team Member 1',
+    role: 'Founder & CEO',
+    image: '/team/team-1.jpg',
   },
   {
-    name: 'Elena Vance',
-    role: 'Managing Director & Brand Strategist',
-    bio: 'Brand positioning strategist with deep experience guiding premium brands toward market authority.',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800',
+    name: 'Team Member 2',
+    role: 'Head of Strategy',
+    image: '/team/team-2.jpg',
   },
   {
-    name: 'Marcus Sterling',
-    role: 'Creative & Visual Director',
-    bio: 'Award-winning art director specializing in editorial visual systems and dynamic typography.',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800',
+    name: 'Team Member 3',
+    role: 'Creative Director',
+    image: '/team/team-3.jpg',
+  },
+  {
+    name: 'Team Member 4',
+    role: 'Head of Performance Marketing',
+    image: '/team/team-4.jpg',
   },
 ];
 
@@ -70,20 +72,19 @@ const teamCardVariants = {
     y: 0,
     transition: {
       duration: 0.7,
-      delay: i * 0.15,
+      delay: i * 0.12,
       ease: EASE_OUT_SPRING,
     },
   }),
 };
 
-// Parallax hero image component
 function ParallaxHeroImage() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start end', 'end start'],
   });
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
 
   return (
     <div ref={ref} className="relative aspect-[16/9] sm:aspect-[21/9] w-full rounded-sm overflow-hidden shadow-2xl">
@@ -127,19 +128,19 @@ export default function AboutPage() {
 
         <FadeUp delay={0.35} y={30}>
           <p className="mt-6 sm:mt-8 text-ink/85 text-base sm:text-xl md:text-2xl font-light max-w-3xl leading-relaxed">
-            Branvoy is a boutique digital marketing and brand strategy agency based in Faisalabad. We combine restrained visual design with aggressive performance data to scale ambitious brands.
+            Branvoy is a boutique digital marketing and brand strategy agency based in Dubai. We combine restrained visual design with aggressive performance data to scale ambitious brands.
           </p>
         </FadeUp>
       </section>
 
-      {/* Hero Image Section — Parallax zoom on scroll */}
+      {/* Hero Image Section */}
       <section className="px-6 sm:px-8 md:px-12 max-w-7xl mx-auto mb-20 sm:mb-32">
         <ImageReveal duration={1.1}>
           <ParallaxHeroImage />
         </ImageReveal>
       </section>
 
-      {/* Principles Section — clip-path curtain reveal per card */}
+      {/* Principles Section */}
       <section className="px-5 sm:px-8 md:px-12 max-w-[1400px] mx-auto mb-24 sm:mb-36">
         <div className="mb-12 sm:mb-16">
           <FadeUp>
@@ -179,7 +180,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Leadership Team — Perfectly contained inside dark green section with zero text overflow */}
+      {/* Leadership Team */}
       <section className="bg-ink text-ivory py-20 sm:py-28 md:py-32 px-5 sm:px-8 md:px-12 mb-20 sm:mb-32 border-t border-ivory/10 relative overflow-hidden">
         <div className="max-w-7xl mx-auto w-full">
           <div className="mb-12 sm:mb-16 md:mb-20">
@@ -197,8 +198,8 @@ export default function AboutPage() {
             />
           </div>
 
-          {/* Grid Layout for Team — fully responsive & neatly contained */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 w-full">
+          {/* 2-col on mobile, 4-col on lg — photos only, no bio overlap */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 md:gap-8 w-full">
             {team.map((member, i) => (
               <motion.div
                 key={member.name}
@@ -207,27 +208,28 @@ export default function AboutPage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.15 }}
-                className="group flex flex-col h-full bg-ivory/5 border border-ivory/10 p-5 sm:p-6 rounded-sm backdrop-blur-sm"
+                className="group flex flex-col bg-ivory/5 border border-ivory/10 rounded-sm overflow-hidden backdrop-blur-sm"
               >
-                <div className="relative aspect-[4/5] w-full duotone rounded-sm overflow-hidden mb-5 shadow-xl flex-shrink-0">
+                {/* Photo — fixed aspect ratio so bio never overlaps */}
+                <div className="relative w-full aspect-[3/4] overflow-hidden flex-shrink-0">
                   <Image
                     src={member.image}
                     alt={member.name}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-700"
+                    priority={i < 2}
                   />
+                  {/* Subtle gradient at bottom of photo */}
+                  <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-ink/80 to-transparent pointer-events-none" />
                 </div>
-                <div className="flex flex-col flex-grow justify-between">
-                  <div>
-                    <h3 className="font-serif text-2xl sm:text-3xl text-ivory leading-tight">{member.name}</h3>
-                    <div className="text-xs text-primary font-mono uppercase tracking-wider mt-1.5 mb-3 font-semibold">
-                      {member.role}
-                    </div>
+
+                {/* Name & role — separate block below photo, never overlapping */}
+                <div className="p-4 sm:p-5 flex-shrink-0">
+                  <h3 className="font-serif text-lg sm:text-xl text-ivory leading-tight">{member.name}</h3>
+                  <div className="text-[11px] text-primary font-mono uppercase tracking-wider mt-1 font-semibold">
+                    {member.role}
                   </div>
-                  <p className="text-ivory/80 text-xs sm:text-sm font-light leading-relaxed">
-                    {member.bio}
-                  </p>
                 </div>
               </motion.div>
             ))}
@@ -265,7 +267,7 @@ export default function AboutPage() {
             <span className="text-primary">•</span>
             <span>SENIOR PARTNER FOCUS</span>
             <span className="text-primary">•</span>
-            <span>FAISALABAD STUDIO</span>
+            <span>DUBAI STUDIO</span>
             <span className="text-primary">•</span>
             <span>EST. 2022</span>
             <span className="text-primary">•</span>
@@ -279,7 +281,7 @@ export default function AboutPage() {
             <span className="text-primary">•</span>
             <span>SENIOR PARTNER FOCUS</span>
             <span className="text-primary">•</span>
-            <span>FAISALABAD STUDIO</span>
+            <span>DUBAI STUDIO</span>
             <span className="text-primary">•</span>
             <span>EST. 2022</span>
             <span className="text-primary">•</span>
