@@ -8,6 +8,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Prevent mobile browser address bar resize from breaking ScrollTrigger pins
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 export default function LenisProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
@@ -16,14 +19,13 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
+    // Initialize Lenis ONLY for smooth mouse wheel / touchpad scrolling.
+    // We intentionally DO NOT hijack touch events (syncTouch / smoothTouch are omitted/false)
+    // so mobile touch devices use native hardware-accelerated scrolling.
+    // Native touch scroll is 100% compatible with GSAP ScrollTrigger pin & scrub.
     const lenis = new Lenis({
       duration: 0.9,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      // syncTouch delegates touch-scroll momentum to Lenis,
-      // which properly syncs with GSAP ticker so ScrollTrigger
-      // pin+scrub works correctly on mobile touch devices.
-      syncTouch: true,
-      syncTouchLerp: 0.075,
       smoothWheel: true,
       infinite: false,
       autoResize: true,
@@ -34,16 +36,14 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
     // Sync Lenis scroll position with ScrollTrigger on every scroll event
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Use gsap.ticker instead of manual requestAnimationFrame loop.
-    // This ensures Lenis updates are in perfect sync with GSAP's
-    // rendering pipeline — fewer frame mismatches, less overhead.
+    // Sync Lenis with GSAP ticker for frame-perfect desktop scroll animation
     const tickerCallback = (time: number) => {
-      lenis.raf(time * 1000); // gsap.ticker provides time in seconds, Lenis expects ms
+      lenis.raf(time * 1000);
     };
     gsap.ticker.add(tickerCallback);
 
-    // Disable Lenis' built-in rAF since we're using gsap.ticker
-    gsap.ticker.lagSmoothing(0);
+    // Keep GSAP lagSmoothing intact for fluid mobile performance
+    gsap.ticker.lagSmoothing(1000, 16);
 
     return () => {
       gsap.ticker.remove(tickerCallback);

@@ -139,12 +139,11 @@ export default function HomePage() {
         scrollTrigger: {
           trigger: section,
           pin: true,
-          scrub: 0.8,
+          anticipatePin: 1,
+          scrub: 0.5,
           start: 'top top',
           end: () => `+=${getScrollDistance()}`,
           invalidateOnRefresh: true,
-          // Explicitly tell ScrollTrigger how to compute anticipatedRunY
-          // so mobile touch-scroll with Lenis syncTouch works
           onUpdate: (self) => {
             const pct = Math.round(self.progress * 100);
             if (progressTextRef.current) {
