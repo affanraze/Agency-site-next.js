@@ -1,12 +1,11 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { motion } from 'framer-motion';
 import { FadeUp } from '@/components/animations/FadeUp';
 import { RevealText } from '@/components/animations/RevealText';
 
@@ -82,27 +81,13 @@ const servicesPreview = [
   },
 ];
 
-const EASE_OUT_SPRING = [0.16, 1, 0.3, 1] as const;
-
-const serviceCardVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.65,
-      delay: i * 0.12,
-      ease: EASE_OUT_SPRING,
-    },
-  }),
-};
-
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const heroTitleRef = useRef<HTMLHeadingElement>(null);
   const horizontalSectionRef = useRef<HTMLDivElement>(null);
   const horizontalTrackRef = useRef<HTMLDivElement>(null);
   const revealRef = useRef<HTMLDivElement>(null);
+  const servicesGridRef = useRef<HTMLDivElement>(null);
 
   // Direct DOM refs for zero-re-render scroll progress bar updates
   const progressTextRef = useRef<HTMLSpanElement>(null);
@@ -138,21 +123,28 @@ export default function HomePage() {
     if (!horizontalSectionRef.current || !horizontalTrackRef.current) return;
     const mm = gsap.matchMedia();
 
-    // Activate horizontal scroll on all devices (mobile & desktop)
     mm.add('(prefers-reduced-motion: no-preference)', () => {
       const track = horizontalTrackRef.current!;
-      const totalScroll = track.scrollWidth - window.innerWidth;
+      const section = horizontalSectionRef.current!;
+
+      // Use a function for end so it recalculates on refresh
+      // (after images load, fonts render, etc.)
+      const getScrollDistance = () => {
+        return track.scrollWidth - window.innerWidth;
+      };
 
       gsap.to(track, {
-        x: -totalScroll,
+        x: () => -getScrollDistance(),
         ease: 'none',
         scrollTrigger: {
-          trigger: horizontalSectionRef.current,
+          trigger: section,
           pin: true,
           scrub: 0.8,
           start: 'top top',
-          end: () => `+=${totalScroll}`,
+          end: () => `+=${getScrollDistance()}`,
           invalidateOnRefresh: true,
+          // Explicitly tell ScrollTrigger how to compute anticipatedRunY
+          // so mobile touch-scroll with Lenis syncTouch works
           onUpdate: (self) => {
             const pct = Math.round(self.progress * 100);
             if (progressTextRef.current) {
@@ -166,6 +158,55 @@ export default function HomePage() {
       });
     });
   }, { scope: horizontalSectionRef });
+
+  // Ensure ScrollTrigger recalculates after all assets are loaded
+  useEffect(() => {
+    const refreshST = () => {
+      ScrollTrigger.refresh();
+    };
+
+    // Refresh after fonts/images finish loading
+    if (document.readyState === 'complete') {
+      // Already loaded, still do a delayed refresh for layout settle
+      setTimeout(refreshST, 200);
+    } else {
+      window.addEventListener('load', refreshST);
+    }
+
+    // Also refresh after a generous delay to catch late-loading images
+    const fallbackTimer = setTimeout(refreshST, 1500);
+
+    return () => {
+      window.removeEventListener('load', refreshST);
+      clearTimeout(fallbackTimer);
+    };
+  }, []);
+
+  // Service cards — GSAP batch reveal (replaces framer-motion)
+  useGSAP(() => {
+    if (!servicesGridRef.current) return;
+    const mm = gsap.matchMedia();
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      // Set initial state
+      gsap.set('.service-card', { opacity: 0, y: 50 });
+
+      ScrollTrigger.batch('.service-card', {
+        onEnter: (elements) => {
+          gsap.to(elements, {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+            stagger: 0.12,
+            ease: 'power2.out',
+            overwrite: true,
+          });
+        },
+        start: 'top 85%',
+        once: true,
+      });
+    });
+  }, { scope: servicesGridRef });
 
   // Stats reveal
   useGSAP(() => {
@@ -272,6 +313,7 @@ export default function HomePage() {
       <section
         ref={horizontalSectionRef}
         className="relative bg-ink text-ivory overflow-hidden"
+        style={{ touchAction: 'pan-y' }}
       >
         {/* Header always visible */}
         <div className="px-5 sm:px-8 md:px-12 pt-16 sm:pt-20 md:pt-24 pb-4 sm:pb-6 z-30 flex items-center justify-between border-b border-ivory/10 w-full max-w-7xl mx-auto">
@@ -292,8 +334,8 @@ export default function HomePage() {
             <div className="w-24 sm:w-36 md:w-48 h-1.5 bg-ivory/20 rounded-full overflow-hidden">
               <div
                 ref={progressBarRef}
-                className="h-full bg-primary transition-all duration-75"
-                style={{ width: '0%' }}
+                className="h-full bg-primary rounded-full"
+                style={{ width: '0%', transition: 'none' }}
               />
             </div>
           </div>
@@ -309,11 +351,10 @@ export default function HomePage() {
               items-center
               w-max
               h-[68vh] sm:h-[70vh] md:h-[72vh] min-h-[450px] md:min-h-[420px] md:max-h-[580px]
-              will-change-transform
             "
           >
             {/* Introductory Card */}
-            <div className="case-scroll-card w-[88vw] sm:w-[65vw] md:w-[38vw] lg:w-[32vw] flex-shrink-0 flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-md rounded-sm h-full min-h-[440px] md:min-h-0 relative overflow-hidden">
+            <div className="case-scroll-card w-[88vw] sm:w-[65vw] md:w-[38vw] lg:w-[32vw] flex-shrink-0 flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-sm md:backdrop-blur-md rounded-sm h-full min-h-[440px] md:min-h-0 relative overflow-hidden">
               <div className="absolute -right-4 -bottom-4 font-serif text-7xl md:text-8xl text-ivory/5 select-none pointer-events-none">
                 00
               </div>
@@ -339,7 +380,7 @@ export default function HomePage() {
             {featuredCases.map((item) => (
               <div
                 key={item.id}
-                className="case-scroll-card w-[88vw] sm:w-[70vw] md:w-[46vw] lg:w-[40vw] flex-shrink-0 h-full min-h-[440px] md:min-h-0 group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-all duration-300 overflow-hidden shadow-2xl"
+                className="case-scroll-card w-[88vw] sm:w-[70vw] md:w-[46vw] lg:w-[40vw] flex-shrink-0 h-full min-h-[440px] md:min-h-0 group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-colors duration-300 overflow-hidden shadow-2xl"
               >
                 {/* Background Watermark Index */}
                 <div className="absolute top-4 right-6 sm:right-8 font-serif text-5xl sm:text-6xl md:text-7xl text-ivory/10 font-bold select-none pointer-events-none group-hover:text-primary/20 transition-colors">
@@ -361,7 +402,7 @@ export default function HomePage() {
                   <span className="font-mono text-xs text-primary font-bold bg-ink/80 px-3 py-1 rounded-full border border-primary/30">
                     {item.id}
                   </span>
-                  <span className="text-xs uppercase tracking-wider text-ivory/80 bg-ink/80 backdrop-blur-md px-3 py-1 rounded-full border border-ivory/10 font-mono">
+                  <span className="text-xs uppercase tracking-wider text-ivory/80 bg-ink/80 px-3 py-1 rounded-full border border-ivory/10 font-mono">
                     {item.year}
                   </span>
                 </div>
@@ -443,16 +484,11 @@ export default function HomePage() {
             </FadeUp>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-            {servicesPreview.map((service, i) => (
-              <motion.div
+          <div ref={servicesGridRef} className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {servicesPreview.map((service) => (
+              <div
                 key={service.num}
-                custom={i}
-                variants={serviceCardVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.15 }}
-                className="p-6 sm:p-8 border border-ink/10 bg-white/70 hover:bg-sage-tint/60 transition-colors duration-300 rounded-sm flex flex-col justify-between group shadow-sm hover:shadow-md h-full"
+                className="service-card p-6 sm:p-8 border border-ink/10 bg-white/70 hover:bg-sage-tint/60 transition-colors duration-300 rounded-sm flex flex-col justify-between group shadow-sm hover:shadow-md h-full"
               >
                 <div>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6">
@@ -483,7 +519,7 @@ export default function HomePage() {
                     Explore details →
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>

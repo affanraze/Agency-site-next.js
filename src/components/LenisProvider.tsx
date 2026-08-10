@@ -19,27 +19,34 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
     const lenis = new Lenis({
       duration: 0.9,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 1.2,
+      // syncTouch delegates touch-scroll momentum to Lenis,
+      // which properly syncs with GSAP ticker so ScrollTrigger
+      // pin+scrub works correctly on mobile touch devices.
+      syncTouch: true,
+      syncTouchLerp: 0.075,
       smoothWheel: true,
       infinite: false,
+      autoResize: true,
     });
 
     lenisRef.current = lenis;
 
-    // Sync Lenis with ScrollTrigger
+    // Sync Lenis scroll position with ScrollTrigger on every scroll event
     lenis.on('scroll', ScrollTrigger.update);
 
-    let animationFrameId: number;
-
-    const raf = (time: number) => {
-      lenis.raf(time);
-      animationFrameId = requestAnimationFrame(raf);
+    // Use gsap.ticker instead of manual requestAnimationFrame loop.
+    // This ensures Lenis updates are in perfect sync with GSAP's
+    // rendering pipeline — fewer frame mismatches, less overhead.
+    const tickerCallback = (time: number) => {
+      lenis.raf(time * 1000); // gsap.ticker provides time in seconds, Lenis expects ms
     };
+    gsap.ticker.add(tickerCallback);
 
-    animationFrameId = requestAnimationFrame(raf);
+    // Disable Lenis' built-in rAF since we're using gsap.ticker
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      gsap.ticker.remove(tickerCallback);
       lenis.destroy();
       lenisRef.current = null;
     };
@@ -51,7 +58,7 @@ export default function LenisProvider({ children }: { children: React.ReactNode 
       lenisRef.current.scrollTo(0, { immediate: true });
       setTimeout(() => {
         ScrollTrigger.refresh();
-      }, 50);
+      }, 100);
     }
   }, [pathname]);
 
