@@ -1,6 +1,11 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface RevealTextProps {
   text: string;
@@ -23,61 +28,52 @@ export function RevealText({
   once = true,
   as: Tag = 'div',
 }: RevealTextProps) {
-  const shouldReduce = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
   const words = text.split(' ');
 
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: shouldReduce ? 0 : stagger,
-        delayChildren: shouldReduce ? 0 : delay,
-      },
-    },
-  };
+  useGSAP(
+    () => {
+      if (!containerRef.current) return;
 
-  const wordVariants = {
-    hidden: {
-      y: shouldReduce ? 0 : '110%',
-      opacity: shouldReduce ? 1 : 0,
+      const mm = gsap.matchMedia();
+
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.from('.reveal-word', {
+          y: '110%',
+          opacity: 0,
+          duration,
+          delay,
+          stagger,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top 80%',
+            once,
+          },
+        });
+      });
     },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: shouldReduce ? 0.01 : duration,
-        ease: [0.16, 1, 0.3, 1] as const,
-      },
-    },
-  };
+    { scope: containerRef, dependencies: [delay, duration, stagger, once, text] }
+  );
 
   return (
-    <Tag className={className}>
-      <motion.span
-        className="inline"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once, amount: 0.2 }}
-      >
+    <Tag ref={containerRef as any} className={className}>
+      <span className="inline">
         {words.map((word, i) => (
           <span
             key={i}
             className="inline-block overflow-hidden"
             style={{ verticalAlign: 'bottom' }}
           >
-            <motion.span
-              className={`inline-block ${wordClassName ?? ''}`}
-              variants={wordVariants}
-            >
+            <span className={`reveal-word inline-block ${wordClassName ?? ''}`}>
               {word}
-            </motion.span>
+            </span>
             {i < words.length - 1 && (
               <span className="inline-block">&nbsp;</span>
             )}
           </span>
         ))}
-      </motion.span>
+      </span>
     </Tag>
   );
 }

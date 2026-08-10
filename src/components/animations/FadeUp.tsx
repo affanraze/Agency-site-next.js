@@ -1,7 +1,11 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface FadeUpProps {
   children: ReactNode;
@@ -22,21 +26,44 @@ export function FadeUp({
   once = true,
   amount = 0.15,
 }: FadeUpProps) {
-  const shouldReduce = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      if (!containerRef.current) return;
+
+      const getStartPos = (amt: typeof amount): string => {
+        if (typeof amt === 'number') {
+          return `top ${Math.round((1 - amt) * 100)}%`;
+        }
+        if (amt === 'some') return 'top 85%';
+        if (amt === 'all') return 'top 20%';
+        return 'top 85%';
+      };
+
+      const mm = gsap.matchMedia();
+
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.from(containerRef.current, {
+          y,
+          opacity: 0,
+          duration,
+          delay,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: getStartPos(amount),
+            once,
+          },
+        });
+      });
+    },
+    { scope: containerRef, dependencies: [delay, duration, y, once, amount] }
+  );
 
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: shouldReduce ? 0 : y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once, amount }}
-      transition={{
-        duration: shouldReduce ? 0.01 : duration,
-        delay: shouldReduce ? 0 : delay,
-        ease: [0.16, 1, 0.3, 1] as const,
-      }}
-    >
+    <div ref={containerRef} className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
