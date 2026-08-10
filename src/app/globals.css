@@ -108,6 +108,23 @@ body {
   }
 }
 
+/* Mobile performance: reduce expensive GPU effects */
+@media (max-width: 767px) {
+  /* Reduce backdrop-blur on mobile — very expensive on low-end GPUs */
+  .glass-dark,
+  .glass-light {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Contain layout recalculations for animated sections */
+  .service-card,
+  .stat-card,
+  .case-scroll-card {
+    contain: layout style;
+  }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
