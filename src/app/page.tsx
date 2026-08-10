@@ -118,20 +118,17 @@ export default function HomePage() {
     });
   }, { scope: heroRef });
 
-  // Pinned Horizontal Scroll — desktop & mobile
+  // Pinned Horizontal Scroll — Desktop ONLY (md: screens and up)
   useGSAP(() => {
     if (!horizontalSectionRef.current || !horizontalTrackRef.current) return;
     const mm = gsap.matchMedia();
 
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
+    // Desktop: Pinned horizontal scroll driven by vertical scroll
+    mm.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
       const track = horizontalTrackRef.current!;
       const section = horizontalSectionRef.current!;
 
-      // Use a function for end so it recalculates on refresh
-      // (after images load, fonts render, etc.)
-      const getScrollDistance = () => {
-        return track.scrollWidth - window.innerWidth;
-      };
+      const getScrollDistance = () => track.scrollWidth - window.innerWidth;
 
       gsap.to(track, {
         x: () => -getScrollDistance(),
@@ -158,21 +155,33 @@ export default function HomePage() {
     });
   }, { scope: horizontalSectionRef });
 
+  // Mobile horizontal scroll progress handler
+  const handleMobileTrackScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) return;
+    const target = e.currentTarget;
+    const maxScroll = target.scrollWidth - target.clientWidth;
+    if (maxScroll <= 0) return;
+    const pct = Math.round((target.scrollLeft / maxScroll) * 100);
+    if (progressTextRef.current) {
+      progressTextRef.current.textContent = `${pct}%`;
+    }
+    if (progressBarRef.current) {
+      progressBarRef.current.style.width = `${pct}%`;
+    }
+  };
+
   // Ensure ScrollTrigger recalculates after all assets are loaded
   useEffect(() => {
     const refreshST = () => {
       ScrollTrigger.refresh();
     };
 
-    // Refresh after fonts/images finish loading
     if (document.readyState === 'complete') {
-      // Already loaded, still do a delayed refresh for layout settle
       setTimeout(refreshST, 200);
     } else {
       window.addEventListener('load', refreshST);
     }
 
-    // Also refresh after a generous delay to catch late-loading images
     const fallbackTimer = setTimeout(refreshST, 1500);
 
     return () => {
@@ -181,13 +190,12 @@ export default function HomePage() {
     };
   }, []);
 
-  // Service cards — GSAP batch reveal (replaces framer-motion)
+  // Service cards — GSAP batch reveal
   useGSAP(() => {
     if (!servicesGridRef.current) return;
     const mm = gsap.matchMedia();
 
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      // Set initial state
       gsap.set('.service-card', { opacity: 0, y: 50 });
 
       ScrollTrigger.batch('.service-card', {
@@ -308,52 +316,60 @@ export default function HomePage() {
       </section>
 
       {/* CASE STUDIES SECTION
-          - Pinned horizontal scroll for both desktop and mobile */}
+          - Desktop: Pinned horizontal ScrollTrigger
+          - Mobile: Native responsive touch swipe slider with live 0-100% progress */}
       <section
         ref={horizontalSectionRef}
         className="relative bg-ink text-ivory overflow-hidden"
-        style={{ touchAction: 'pan-y' }}
       >
         {/* Header always visible */}
-        <div className="px-5 sm:px-8 md:px-12 pt-16 sm:pt-20 md:pt-24 pb-4 sm:pb-6 z-30 flex items-center justify-between border-b border-ivory/10 w-full max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
+        <div className="px-5 sm:px-8 md:px-12 pt-14 sm:pt-20 md:pt-24 pb-4 sm:pb-6 z-30 flex items-center justify-between border-b border-ivory/10 w-full max-w-7xl mx-auto">
+          <div className="flex items-center gap-3 sm:gap-4">
             <span className="text-xs font-mono uppercase tracking-[0.25em] text-primary font-bold">
               02 / Featured Case Studies
             </span>
-            <span className="text-xs text-ivory/60 font-mono hidden sm:inline">
+            <span className="text-[10px] text-ivory/60 font-mono hidden md:inline">
               [ PINNED HORIZONTAL ARCHIVE ]
+            </span>
+            <span className="text-[10px] text-primary font-mono inline md:hidden animate-pulse">
+              [ SWIPE CARDS → ]
             </span>
           </div>
 
-          {/* Progress bar — visible on mobile and desktop */}
+          {/* Progress bar */}
           <div className="flex items-center gap-3 sm:gap-4">
             <span ref={progressTextRef} className="text-xs font-mono text-ivory/80 font-medium">
               0%
             </span>
-            <div className="w-24 sm:w-36 md:w-48 h-1.5 bg-ivory/20 rounded-full overflow-hidden">
+            <div className="w-20 sm:w-36 md:w-48 h-1.5 bg-ivory/20 rounded-full overflow-hidden">
               <div
                 ref={progressBarRef}
                 className="h-full bg-primary rounded-full"
-                style={{ width: '0%', transition: 'none' }}
+                style={{ width: '0%', transition: 'width 0.1s ease-out' }}
               />
             </div>
           </div>
         </div>
 
-        {/* Outer wrapper for pinned horizontal scroll */}
-        <div className="min-h-[70vh] md:min-h-screen flex flex-col justify-center py-6 md:py-0">
+        {/* Outer wrapper */}
+        <div className="min-h-[60vh] md:min-h-screen flex flex-col justify-center py-6 md:py-0">
           <div
             ref={horizontalTrackRef}
+            onScroll={handleMobileTrackScroll}
             className="
+              w-full md:w-max
+              max-w-full md:max-w-none
+              overflow-x-auto md:overflow-visible
+              snap-x snap-mandatory md:snap-none
               flex gap-5 sm:gap-6 md:gap-10
               px-5 sm:px-8 md:px-16
               items-center
-              w-max
-              h-[68vh] sm:h-[70vh] md:h-[72vh] min-h-[450px] md:min-h-[420px] md:max-h-[580px]
+              h-[62vh] sm:h-[70vh] md:h-[72vh] min-h-[420px] md:max-h-[580px]
+              scrollbar-none
             "
           >
             {/* Introductory Card */}
-            <div className="case-scroll-card w-[88vw] sm:w-[65vw] md:w-[38vw] lg:w-[32vw] flex-shrink-0 flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-sm md:backdrop-blur-md rounded-sm h-full min-h-[440px] md:min-h-0 relative overflow-hidden">
+            <div className="case-scroll-card snap-start flex-shrink-0 w-[84vw] sm:w-[65vw] md:w-[38vw] lg:w-[32vw] flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 backdrop-blur-sm md:backdrop-blur-md rounded-sm h-full relative overflow-hidden">
               <div className="absolute -right-4 -bottom-4 font-serif text-7xl md:text-8xl text-ivory/5 select-none pointer-events-none">
                 00
               </div>
@@ -369,8 +385,9 @@ export default function HomePage() {
                 <p className="text-xs sm:text-sm text-ivory/70 leading-relaxed font-light">
                   Explore how our minimalist visual systems and razor-sharp digital targeting translated into verified market leadership.
                 </p>
-                <div className="text-[10px] sm:text-xs font-mono text-ivory/40 uppercase tracking-widest">
-                  Scroll down to explore →
+                <div className="text-[10px] sm:text-xs font-mono text-primary md:text-ivory/40 uppercase tracking-widest">
+                  <span className="md:hidden">Swipe left to view cards →</span>
+                  <span className="hidden md:inline">Scroll down to explore →</span>
                 </div>
               </div>
             </div>
@@ -379,7 +396,7 @@ export default function HomePage() {
             {featuredCases.map((item) => (
               <div
                 key={item.id}
-                className="case-scroll-card w-[88vw] sm:w-[70vw] md:w-[46vw] lg:w-[40vw] flex-shrink-0 h-full min-h-[440px] md:min-h-0 group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-colors duration-300 overflow-hidden shadow-2xl"
+                className="case-scroll-card snap-start flex-shrink-0 w-[84vw] sm:w-[70vw] md:w-[46vw] lg:w-[40vw] h-full group relative flex flex-col justify-between p-6 sm:p-8 md:p-10 border border-ivory/15 bg-ivory/5 rounded-sm hover:border-primary/50 transition-colors duration-300 overflow-hidden shadow-2xl"
               >
                 {/* Background Watermark Index */}
                 <div className="absolute top-4 right-6 sm:right-8 font-serif text-5xl sm:text-6xl md:text-7xl text-ivory/10 font-bold select-none pointer-events-none group-hover:text-primary/20 transition-colors">
@@ -393,7 +410,7 @@ export default function HomePage() {
                     alt={item.title}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 88vw, 42vw"
+                    sizes="(max-width: 768px) 84vw, 42vw"
                   />
                 </div>
 
@@ -439,7 +456,7 @@ export default function HomePage() {
             ))}
 
             {/* Outro CTA Card */}
-            <div className="case-scroll-card w-[88vw] sm:w-[65vw] md:w-[36vw] lg:w-[28vw] flex-shrink-0 flex flex-col justify-center items-center text-center p-6 sm:p-8 md:p-10 border border-primary/50 bg-primary/10 rounded-sm h-full min-h-[440px] md:min-h-0">
+            <div className="case-scroll-card snap-start flex-shrink-0 w-[84vw] sm:w-[65vw] md:w-[36vw] lg:w-[28vw] flex flex-col justify-center items-center text-center p-6 sm:p-8 md:p-10 border border-primary/50 bg-primary/10 rounded-sm h-full">
               <span className="font-serif text-2xl sm:text-3xl md:text-4xl text-ivory mb-6 leading-tight">
                 Ready for measurable market authority?
               </span>
